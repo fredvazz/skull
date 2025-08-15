@@ -1124,31 +1124,21 @@ if (!useTextAsId && task.id === state.currentFocusTask) {
             });
 
             // Keyboard shortcuts
-            document.addEventListener('keydown', e => {
-                if (document.activeElement.tagName === 'INPUT' || 
-                    document.activeElement.tagName === 'TEXTAREA' ||
-                    document.querySelector('.modal.active')) {
-                    return;
-                }
-                
-                if (e.code === 'Space') { 
-                    e.preventDefault(); 
-                    toggleTimer(); 
-                }
-                if (e.code === 'KeyR') { 
-                    e.preventDefault(); 
-                    resetTimer(); 
-                }
-                if (e.code === 'KeyS') {
-                    e.preventDefault();
-                    skipPhase();
-                }
-                if (e.code === 'Escape') {
-                    document.querySelectorAll('.modal.active').forEach(modal => {
-                        closeModal(modal);
-                    });
-                }
-            });
+document.addEventListener('keydown', e => {
+    if (document.activeElement.tagName === 'INPUT' || 
+        document.activeElement.tagName === 'TEXTAREA' ||
+        document.querySelector('.modal.active')) {
+        return;
+    }
+    
+    if (e.code === 'Space') { 
+        e.preventDefault(); 
+        // Only trigger if not clicking on the start button
+        if (e.target !== elements.startBtn && !elements.startBtn.contains(e.target)) {
+            toggleTimer(); 
+        }
+    }
+});
 
             // Auto-save and cleanup
             window.addEventListener('beforeunload', () => {
