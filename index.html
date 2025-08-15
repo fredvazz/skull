@@ -153,7 +153,7 @@
                         </div>
                         <div style="font-size: 24px; color: #666;">/</div>
                         <div class="stat-group">
-                            <input type="number" class="goal-edit" id="goal-edit" value="8" min="1" max="50">
+                            <input type="number" class="goal-edit" id="goal-edit" value="14" min="1" max="50">
                             <div class="stat-label">Meta</div>
                         </div>
                         <div class="stat-group">
@@ -266,7 +266,7 @@
             isRestPhase: false,
             timerInterval: null,
             cyclesCompleted: 0,
-            dailyGoal: 8,
+            dailyGoal: 14,
             doTodayTasks: [],
             nonNegotiables: [],
             nonNegotiablesStatus: {},
@@ -276,6 +276,16 @@
             audioContext: null,
             isSidebarCollapsed: false
         };
+
+        // Default non-negotiables for new users
+        const DEFAULT_NON_NEGOTIABLES = [
+            { text: 'Gravar Sonho', frequency: 'daily' },
+            { text: 'Sessão de Hipnose', frequency: 'daily' },
+            { text: 'Exercício Flash', frequency: 'daily' },
+            { text: 'Treino de 30 minutos', frequency: 'daily' },
+            { text: 'Alongamento de 15 minutos', frequency: 'daily' },
+            { text: 'Liberação Facial', frequency: 'daily' }
+        ];
         
         const FOCUS_TIME = 33 * 60 + 33;
         const REST_TIME = 6 * 60 + 37;
@@ -404,10 +414,25 @@
                     state.isRunning = false;
                     state.timerInterval = null;
                     state.audioContext = null;
+                    
+                    // Ensure daily goal is at least 14
+                    if (state.dailyGoal < 14) {
+                        state.dailyGoal = 14;
+                    }
+                    
+                    // If non-negotiables list is empty, add defaults
+                    if (!state.nonNegotiables || state.nonNegotiables.length === 0) {
+                        state.nonNegotiables = [...DEFAULT_NON_NEGOTIABLES];
+                    }
+                } else {
+                    // First time user - set up default non-negotiables
+                    state.nonNegotiables = [...DEFAULT_NON_NEGOTIABLES];
                 }
             } catch (error) {
                 console.error('Failed to load data:', error);
                 showInAppNotification('Erro', 'Falha ao carregar dados salvos');
+                // Fallback to defaults for new users
+                state.nonNegotiables = [...DEFAULT_NON_NEGOTIABLES];
             }
         }
         
@@ -902,7 +927,7 @@
 
             // Progress goal
             elements.goalEdit.addEventListener('change', () => {
-                state.dailyGoal = validateInput(elements.goalEdit.value, 1, 50, 8);
+                state.dailyGoal = validateInput(elements.goalEdit.value, 14, 50, 14);
                 elements.goalEdit.value = state.dailyGoal;
                 updateProgress();
                 saveData();
@@ -1044,3 +1069,4 @@
     </script>
 </body>
 </html>
+
