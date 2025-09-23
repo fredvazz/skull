@@ -8,32 +8,21 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #ffffff; overflow-x: hidden; }
-        .container { display: flex; min-height: 100vh; position: relative; width: 100%; }
-        .sidebar { width: 280px; background: #111111; padding: 20px; transition: all 0.3s ease; border-right: 1px solid #333; overflow-y: auto; max-height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; scrollbar-width: none; -ms-overflow-style: none; }
-        .sidebar::-webkit-scrollbar { width: 0; height: 0; }
-        .sidebar.collapsed { left: -280px; }
-        .sidebar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .sidebar-title { font-size: 16px; font-weight: 600; }
-        .collapse-btn { background: none; border: none; color: #888; cursor: pointer; font-size: 18px; padding: 8px; border-radius: 4px; transition: all 0.3s ease; }
-        .collapse-btn:hover { color: #ef4444; background: #222; }
-        .day-item { background: #1a1a1a; border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent; }
-        .day-item:hover { background: #222; border-color: #333; }
-        .day-item.today { border-color: #ef4444; background: #1a0f0f; }
-        .day-controls { display: flex; gap: 5px; margin-top: 8px; opacity: 0; transition: opacity 0.3s ease; }
-        .day-item:hover .day-controls { opacity: 1; }
-        .day-control-btn { background: #333; border: none; border-radius: 4px; padding: 4px 8px; color: #aaa; cursor: pointer; font-size: 10px; transition: all 0.3s ease; }
-        .day-control-btn:hover { background: #ef4444; color: #fff; }
-        .day-control-btn.delete:hover { background: #dc2626; }
-        .day-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-        .day-date { font-size: 12px; color: #888; margin-bottom: 6px; }
-        .day-stats { font-size: 12px; color: #aaa; }
-        .cycles-count { color: #ef4444; font-weight: 600; }
-        .main-content { flex: 1; padding: 40px; margin-left: 280px; transition: margin-left 0.3s ease; min-height: 100vh; width: calc(100% - 280px); }
-        .main-content.sidebar-collapsed { margin-left: 0; width: 100%; }
-        .content-wrapper { max-width: 1200px; margin: 0 auto; width: 100%; }
-        .header { text-align: center; margin-bottom: 40px; }
+        .container { display: flex; flex-direction: column; min-height: 100vh; width: 100%; padding: 20px; max-width: 1400px; margin: 0 auto; }
+        
+        .header { text-align: center; margin-bottom: 30px; }
         .header h1 { font-size: 32px; margin-bottom: 8px; }
         .header p { color: #888; font-size: 16px; }
+        
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: #111111; border-radius: 12px; padding: 20px; border: 1px solid #222; }
+        .stats-group { display: flex; gap: 40px; align-items: center; }
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 36px; font-weight: 700; color: #ef4444; }
+        .stat-label { font-size: 14px; color: #888; margin-top: 4px; }
+        .streak-fire { font-size: 24px; margin-left: 5px; }
+        .view-log-btn { padding: 12px 24px; background: #ef4444; color: #ffffff; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .view-log-btn:hover { background: #dc2626; }
+        
         .timer-section { background: #111111; border-radius: 16px; padding: 40px; text-align: center; margin-bottom: 30px; border: 1px solid #222; }
         .phase-indicator { background: #ef4444; color: #ffffff; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; display: inline-block; margin-bottom: 20px; }
         .timer-display { font-size: 72px; font-weight: 300; letter-spacing: -2px; margin-bottom: 10px; font-family: 'SF Mono', Monaco, monospace; }
@@ -45,246 +34,156 @@
         .btn-secondary { background: #333; color: #ffffff; }
         .btn-secondary:hover { background: #444; }
         .keyboard-hints { font-size: 12px; color: #666; }
-        .progress-section { background: #111111; border-radius: 16px; padding: 30px; text-align: center; margin-bottom: 30px; border: 1px solid #222; }
-        .progress-stats { display: flex; justify-content: center; align-items: center; gap: 40px; margin-bottom: 20px; }
-        .stat-group { text-align: center; }
-        .stat-number { font-size: 36px; font-weight: 700; color: #ef4444; margin-bottom: 4px; }
-        .stat-label { font-size: 14px; color: #888; }
-        .progress-bar-container { width: 100%; max-width: 300px; margin: 0 auto; }
-        .progress-bar { width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden; }
-        .progress-fill { height: 100%; background: #ef4444; border-radius: 4px; transition: width 0.3s ease; }
-        .goal-edit { background: none; border: none; color: #ef4444; font-size: 36px; font-weight: 700; width: 60px; text-align: center; cursor: pointer; }
-        .goal-edit:focus { outline: 1px solid #ef4444; border-radius: 4px; }
+        
         .tasks-section { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .task-list { background: #111111; border-radius: 16px; padding: 30px; border: 1px solid #222; }
         .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .task-title { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; flex: 1; }
+        .task-title { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         .task-icon { font-size: 16px; }
-        .task-action { background: none; border: none; color: #666; cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 4px; transition: all 0.3s ease; }
-        .task-action:hover { background: #222; color: #ef4444; }
         .add-task { width: 100%; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 12px; color: #ffffff; font-size: 14px; margin-bottom: 20px; }
         .add-task::placeholder { color: #666; }
         .add-task:focus { outline: none; border-color: #ef4444; }
         .task-item { background: #1a1a1a; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; transition: all 0.3s ease; cursor: pointer; }
+        .task-item:hover { background: #222; }
         .task-item.completed { background: #0f0f0f; order: 1; }
         .task-checkbox { width: 18px; height: 18px; border: 2px solid #333; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; flex-shrink: 0; }
         .task-checkbox.checked { background: #ef4444; border-color: #ef4444; color: #ffffff; }
         .task-text { flex: 1; font-size: 14px; transition: all 0.3s ease; }
-        .task-focus-btn {
-    background: #333;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
-    color: #aaa;
-    cursor: pointer;
-    font-size: 12px;
-    transition: all 0.3s ease;
-    opacity: 0;
-    flex-shrink: 0;
-}
-.task-item:hover .task-focus-btn {
-    opacity: 1;
-}
-.task-focus-btn:hover {
-    background: #ef4444;
-    color: #fff;
-}
-.current-task-indicator {
-    color: #ef4444;
-    font-weight: 600;
-    font-size: 12px;
-    margin-left: 8px;
-}
-.remove-focus-btn {
-    background: #666;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
-    color: #fff;
-    cursor: pointer;
-    font-size: 12px;
-    transition: all 0.3s ease;
-    margin-left: 8px;
-    flex-shrink: 0;
-}
-.remove-focus-btn:hover {
-    background: #888;
-}
         .task-item.completed .task-text { color: #666; text-decoration: line-through; }
+        .task-action { background: none; border: none; color: #666; cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 4px; transition: all 0.3s ease; }
+        .task-action:hover { background: #222; color: #ef4444; }
         .task-progress-container { margin-top: 15px; padding-top: 15px; border-top: 1px solid #222; }
         .task-progress-bar { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
         .task-progress-fill { height: 100%; background: #ef4444; border-radius: 3px; transition: width 0.3s ease; }
         .task-progress-text { font-size: 11px; color: #888; text-align: center; }
-        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
         .modal.active { opacity: 1; visibility: visible; }
-        .modal-content { background: #111111; border-radius: 16px; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; border: 1px solid #222; }
+        .modal-content { background: #111111; border-radius: 16px; padding: 30px; width: 90%; max-width: 1200px; max-height: 85vh; overflow-y: auto; border: 1px solid #222; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-title { font-size: 20px; font-weight: 600; }
-        .close-btn { background: none; border: none; color: #888; cursor: pointer; font-size: 24px; padding: 5px; }
+        .modal-title { font-size: 24px; font-weight: 600; }
+        .close-btn { background: none; border: none; color: #888; cursor: pointer; font-size: 28px; padding: 5px; }
         .close-btn:hover { color: #ef4444; }
-        .config-item { display: flex; gap: 15px; margin-bottom: 15px; align-items: center; }
-        .config-input { flex: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 12px; color: #ffffff; font-size: 14px; }
-        .config-input:focus { outline: none; border-color: #ef4444; }
-        .config-select { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 12px; color: #ffffff; font-size: 14px; cursor: pointer; }
-        .delete-btn { background: #ef4444; border: none; border-radius: 6px; padding: 8px 12px; color: #ffffff; cursor: pointer; font-size: 12px; }
-        .delete-btn:hover { background: #dc2626; }
-        .add-btn { background: #ef4444; border: none; border-radius: 8px; padding: 12px 24px; color: #ffffff; cursor: pointer; font-size: 14px; font-weight: 600; }
-        .add-btn:hover { background: #dc2626; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; }
-        .btn-outline { background: none; border: 1px solid #333; color: #ffffff; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 14px; }
-        .btn-outline:hover { border-color: #ef4444; }
-        .form-group { margin-bottom: 15px; }
-        .form-label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 600; }
-        .form-input { width: 100%; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 12px; color: #ffffff; font-size: 14px; }
-        .form-input:focus { outline: none; border-color: #ef4444; }
-        .sidebar-toggle { position: fixed; top: 20px; left: 20px; z-index: 1001; background: #ef4444; border: none; border-radius: 8px; padding: 12px 15px; color: #ffffff; cursor: pointer; font-size: 16px; transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(239, 68, 68, 0.3); }
-        .sidebar-toggle:hover { background: #dc2626; transform: translateY(-1px); }
-        .notification { 
-    position: fixed; 
-    top: 20px; 
-    right: 20px; 
-    background: #111111; 
-    border: 1px solid #ef4444; 
-    border-radius: 8px; 
-    padding: 15px 20px; 
-    color: #ffffff; 
-    z-index: 1002; 
-    max-width: 300px; 
-    min-width: 250px;
-    transform: translateX(calc(100% + 40px)); 
-    transition: transform 0.3s ease; 
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-.notification.show { 
-    transform: translateX(0); 
-}
+        
+        .log-table-container { overflow-x: auto; border: 1px solid #333; border-radius: 8px; background: #0a0a0a; }
+        .log-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .log-table th { background: #1a1a1a; color: #ef4444; padding: 12px; text-align: left; border-bottom: 2px solid #333; font-weight: 600; position: sticky; top: 0; z-index: 10; }
+        .log-table td { padding: 12px; border-bottom: 1px solid #222; }
+        .log-table tr:hover { background: #151515; }
+        .log-table tr.today-row { background: #1a0f0f; }
+        .task-complete { color: #4ade80; }
+        .task-incomplete { color: #666; }
+        .month-header { background: #ef4444; color: #fff; font-weight: 600; }
+        .month-summary { background: #1a1a1a; font-weight: 600; }
+        .export-btn { padding: 8px 16px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-bottom: 15px; }
+        .export-btn:hover { background: #444; }
+        
+        .notification { position: fixed; top: 20px; right: 20px; background: #111111; border: 1px solid #ef4444; border-radius: 8px; padding: 15px 20px; color: #ffffff; z-index: 1002; max-width: 300px; transform: translateX(calc(100% + 40px)); transition: transform 0.3s ease; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
+        .notification.show { transform: translateX(0); }
         .notification-title { font-weight: 600; margin-bottom: 5px; }
         .notification-body { font-size: 14px; color: #aaa; }
-        @media (max-width: 1024px) { .tasks-section { grid-template-columns: 1fr; gap: 20px; } }
+        
         @media (max-width: 768px) { 
-            .sidebar { left: -280px; } 
-            .sidebar.active { left: 0; } 
-            .main-content { margin-left: 0; padding: 80px 15px 20px 15px; width: 100%; } 
-            .timer-display { font-size: 48px; } 
-            .progress-stats { flex-direction: column; gap: 15px; }
-            .sidebar-toggle { left: 20px !important; }
+            .tasks-section { grid-template-columns: 1fr; gap: 20px; }
+            .timer-display { font-size: 48px; }
+            .stats-group { flex-direction: column; gap: 15px; }
+            .top-bar { flex-direction: column; gap: 20px; }
+            .log-table { font-size: 12px; }
+            .log-table th, .log-table td { padding: 8px; }
         }
     </style>
 </head>
 <body>
-    <button class="sidebar-toggle" id="sidebar-toggle">📅</button>
-
     <div class="container">
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h3 class="sidebar-title">📅 Histórico Diário</h3>
-                <button class="collapse-btn" id="sidebar-collapse-btn">❮</button>
+        <header class="header">
+            <h1>Skull Fuck Terminator</h1>
+            <p>Produtividade. Amplificada.</p>
+        </header>
+
+        <div class="top-bar">
+            <div class="stats-group">
+                <div class="stat-item">
+                    <div class="stat-number" id="cycles-today">0</div>
+                    <div class="stat-label">Ciclos Hoje</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="current-streak">0<span class="streak-fire">🔥</span></div>
+                    <div class="stat-label">Dias Consecutivos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="month-total">0</div>
+                    <div class="stat-label">Ciclos Este Mês</div>
+                </div>
             </div>
-            <div id="history-list"></div>
+            <button class="view-log-btn" id="view-log-btn">📊 Ver Registro Completo</button>
         </div>
 
-        <div class="main-content" id="main-content">
-            <div class="content-wrapper">
-                <header class="header">
-                    <h1>Skull Fuck Terminator</h1>
-                    <p>Produtividade. Amplificada.</p>
-                </header>
-
-                <section class="timer-section">
-                    <div class="phase-indicator" id="phase-indicator">Sessão de Foco</div>
-                    <div class="timer-display" id="timer-display">33:33</div>
-                    <div class="next-phase" id="next-phase">Próximo: Descanso (6:37)</div>
-                    <div class="timer-controls">
-                        <button class="btn btn-primary" id="start-btn">▶ Iniciar</button>
-                        <button class="btn btn-secondary" id="reset-btn">⏹ Resetar</button>
-                        <button class="btn btn-secondary" id="skip-btn">⏭ Pular</button>
-                    </div>
-                    <div class="keyboard-hints">Pressione <strong>Espaço</strong> para iniciar/pausar • <strong>R</strong> para resetar</div>
-                </section>
-
-                <section class="progress-section">
-                    <div class="progress-stats">
-                        <div class="stat-group">
-                            <div class="stat-number" id="cycles-today">0</div>
-                            <div class="stat-label">Ciclos Hoje</div>
-                        </div>
-                        <div style="font-size: 24px; color: #666;">/</div>
-                        <div class="stat-group">
-                            <input type="number" class="goal-edit" id="goal-edit" value="14" min="1" max="50">
-                            <div class="stat-label">Meta</div>
-                        </div>
-                        <div class="stat-group">
-                            <div class="stat-number" id="percentage">0%</div>
-                            <div class="stat-label">Completo</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-                    </div>
-                </section>
-
-                <section class="tasks-section">
-                    <div class="task-list">
-                        <div class="task-header">
-                            <h2 class="task-title"><span class="task-icon">📋</span> Fazer Hoje</h2>
-                            <button class="task-action" id="clear-completed-btn">Limpar Concluídas</button>
-                        </div>
-                        <input type="text" class="add-task" id="add-task-input" placeholder="Adicionar nova tarefa...">
-                        <div id="do-today-list"></div>
-                        <div class="task-progress-container">
-                            <div class="task-progress-bar"><div class="task-progress-fill" id="do-today-progress"></div></div>
-                            <div class="task-progress-text" id="do-today-count">0 de 0 concluídas</div>
-                        </div>
-                    </div>
-
-                    <div class="task-list">
-                        <div class="task-header">
-                            <h2 class="task-title"><span class="task-icon">⚡</span> Inegociáveis</h2>
-                            <button class="task-action" id="config-btn">Configurar</button>
-                        </div>
-                        <div id="non-negotiables-list"></div>
-                        <div class="task-progress-container">
-                            <div class="task-progress-bar"><div class="task-progress-fill" id="non-negotiables-progress"></div></div>
-                            <div class="task-progress-text" id="non-negotiables-count">0 de 0 concluídos</div>
-                        </div>
-                    </div>
-                </section>
+        <section class="timer-section">
+            <div class="phase-indicator" id="phase-indicator">Sessão de Foco</div>
+            <div class="timer-display" id="timer-display">33:33</div>
+            <div class="next-phase" id="next-phase">Próximo: Descanso (6:37)</div>
+            <div class="timer-controls">
+                <button class="btn btn-primary" id="start-btn">▶ Iniciar</button>
+                <button class="btn btn-secondary" id="reset-btn">⏹ Resetar</button>
+                <button class="btn btn-secondary" id="skip-btn">⏭ Pular</button>
             </div>
-        </div>
+            <div class="keyboard-hints">Pressione <strong>Espaço</strong> para iniciar/pausar • <strong>R</strong> para resetar</div>
+        </section>
+
+        <section class="tasks-section">
+            <div class="task-list">
+                <div class="task-header">
+                    <h2 class="task-title"><span class="task-icon">📋</span> Tarefas do Dia</h2>
+                    <button class="task-action" id="clear-completed-btn">Limpar Concluídas</button>
+                </div>
+                <input type="text" class="add-task" id="add-task-input" placeholder="Adicionar nova tarefa...">
+                <div id="do-today-list"></div>
+                <div class="task-progress-container">
+                    <div class="task-progress-bar"><div class="task-progress-fill" id="do-today-progress"></div></div>
+                    <div class="task-progress-text" id="do-today-count">0 de 0 concluídas</div>
+                </div>
+            </div>
+
+            <div class="task-list">
+                <div class="task-header">
+                    <h2 class="task-title"><span class="task-icon">⚡</span> Inegociáveis Diários</h2>
+                </div>
+                <div id="non-negotiables-list"></div>
+                <div class="task-progress-container">
+                    <div class="task-progress-bar"><div class="task-progress-fill" id="non-negotiables-progress"></div></div>
+                    <div class="task-progress-text" id="non-negotiables-count">0 de 7 concluídos</div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <div class="modal" id="edit-day-modal">
+    <div class="modal" id="log-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title" id="edit-day-modal-title">Editar Dia</h2>
-                <button class="close-btn" data-close-modal="edit-day-modal">×</button>
+                <h2 class="modal-title">📊 Registro de Produtividade</h2>
+                <button class="close-btn" id="close-log-modal">×</button>
             </div>
-            <div class="form">
-                <div class="form-group"><label class="form-label">Data</label><input type="date" id="edit-day-date" class="form-input"></div>
-                <div class="form-group"><label class="form-label">Ciclos Completos</label><input type="number" id="edit-day-cycles" class="form-input" min="0"></div>
-                <div class="form-group"><label class="form-label">Tarefas (uma por linha)</label><textarea id="edit-day-tasks" class="form-input" rows="6"></textarea></div>
-            </div>
-            <div class="modal-actions">
-                <button class="btn-outline" data-close-modal="edit-day-modal">Cancelar</button>
-                <button class="btn btn-primary" id="save-day-edit-btn">Salvar Alterações</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="config-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Configurar Inegociáveis</h2>
-                <button class="close-btn" data-close-modal="config-modal">×</button>
-            </div>
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <input type="text" id="new-negotiable-input" class="config-input" placeholder="Adicionar novo inegociável...">
-                <button class="add-btn" id="add-negotiable-btn">+</button>
-            </div>
-            <div id="config-list"></div>
-            <div class="modal-actions">
-                <button class="btn-outline" data-close-modal="config-modal">Cancelar</button>
-                <button class="btn btn-primary" id="save-config-btn">Salvar Alterações</button>
+            <button class="export-btn" id="export-btn">📥 Exportar para CSV</button>
+            <div class="log-table-container">
+                <table class="log-table" id="log-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Dia</th>
+                            <th>Ciclos</th>
+                            <th>Reels</th>
+                            <th>Stories</th>
+                            <th>DM</th>
+                            <th>AI/Product</th>
+                            <th>Meditação</th>
+                            <th>Surf/Treino</th>
+                            <th>Leitura</th>
+                            <th>Tarefas</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-table-body">
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -294,25 +193,6 @@
         <div class="notification-body" id="notification-body"></div>
     </div>
 
-    <template id="task-item-template">
-        <div class="task-item">
-            <div class="task-checkbox"></div>
-            <div class="task-text"></div>
-        </div>
-    </template>
-
-    <template id="day-item-template">
-        <div class="day-item">
-            <div class="day-name"></div>
-            <div class="day-date"></div>
-            <div class="day-stats"></div>
-            <div class="day-controls">
-                <button class="day-control-btn edit-btn">Editar</button>
-                <button class="day-control-btn delete delete-btn">Deletar</button>
-            </div>
-        </div>
-    </template>
-    
     <script>
         'use strict';
         
@@ -323,90 +203,52 @@
             isRestPhase: false,
             timerInterval: null,
             cyclesCompleted: 0,
-            dailyGoal: 14,
             doTodayTasks: [],
-            nonNegotiables: [],
-            nonNegotiablesStatus: {},
+            nonNegotiables: [
+                { id: 'reels', text: '1 Reels', completed: false },
+                { id: 'stories', text: '1 Stories Sequence / Single Insight', completed: false },
+                { id: 'dm', text: '1/2 Cicles DM Clients / Followers', completed: false },
+                { id: 'ai', text: '1/2 Cicles AI Knowledge / Product Building', completed: false },
+                { id: 'meditation', text: 'Joe Dispenza Meditation', completed: false },
+                { id: 'surf', text: 'Surf Workout / Session', completed: false },
+                { id: 'reading', text: 'Reading', completed: false }
+            ],
             history: {},
-            currentEditingDay: null,
-            tempNonNegotiables: [],
             audioContext: null,
-            isSidebarCollapsed: false,
-            currentFocusTask: null
+            currentStreak: 0,
+            monthTotal: 0
         };
-
-        // Default non-negotiables for new users
-        const DEFAULT_NON_NEGOTIABLES = [
-            { text: 'Gravar Sonho', frequency: 'daily' },
-            { text: 'Sessão de Hipnose', frequency: 'daily' },
-            { text: 'Exercício Flash', frequency: 'daily' },
-            { text: 'Treino de 30 minutos', frequency: 'daily' },
-            { text: 'Alongamento de 15 minutos', frequency: 'daily' },
-            { text: 'Liberação Facial', frequency: 'daily' }
-        ];
         
         const FOCUS_TIME = 33 * 60 + 33;
         const REST_TIME = 6 * 60 + 37;
 
-        // --- I18N STRINGS ---
-        const i18n = {
-            start: "▶ Iniciar",
-            pause: "⏸ Pausar",
-            focusSession: "Sessão de Foco",
-            restSession: "Sessão de Descanso",
-            nextFocus: `Próximo: Foco (${Math.floor(FOCUS_TIME / 60)}:${(FOCUS_TIME % 60).toString().padStart(2, '0')})`,
-            nextRest: `Próximo: Descanso (${Math.floor(REST_TIME / 60)}:${(REST_TIME % 60).toString().padStart(2, '0')})`,
-            deleteConfirm: (date) => `Você tem certeza que quer deletar os dados de ${date}?`,
-            today: "Hoje",
-            yesterday: "Ontem",
-        };
-        
-        // --- DOM ELEMENTS CACHE ---
+        // --- DOM ELEMENTS ---
         const elements = {
-            sidebar: document.getElementById('sidebar'),
-            mainContent: document.getElementById('main-content'),
-            sidebarToggle: document.getElementById('sidebar-toggle'),
-            sidebarCollapseBtn: document.getElementById('sidebar-collapse-btn'),
-            historyList: document.getElementById('history-list'),
+            cyclesToday: document.getElementById('cycles-today'),
+            currentStreak: document.getElementById('current-streak'),
+            monthTotal: document.getElementById('month-total'),
+            viewLogBtn: document.getElementById('view-log-btn'),
             phaseIndicator: document.getElementById('phase-indicator'),
             timerDisplay: document.getElementById('timer-display'),
             nextPhase: document.getElementById('next-phase'),
             startBtn: document.getElementById('start-btn'),
             resetBtn: document.getElementById('reset-btn'),
             skipBtn: document.getElementById('skip-btn'),
-            cyclesToday: document.getElementById('cycles-today'),
-            goalEdit: document.getElementById('goal-edit'),
-            percentage: document.getElementById('percentage'),
-            progressFill: document.getElementById('progress-fill'),
             clearCompletedBtn: document.getElementById('clear-completed-btn'),
             addTaskInput: document.getElementById('add-task-input'),
             doTodayList: document.getElementById('do-today-list'),
             doTodayProgress: document.getElementById('do-today-progress'),
             doTodayCount: document.getElementById('do-today-count'),
-            configBtn: document.getElementById('config-btn'),
             nonNegotiablesList: document.getElementById('non-negotiables-list'),
             nonNegotiablesProgress: document.getElementById('non-negotiables-progress'),
             nonNegotiablesCount: document.getElementById('non-negotiables-count'),
             notification: document.getElementById('notification'),
             notificationTitle: document.getElementById('notification-title'),
             notificationBody: document.getElementById('notification-body'),
-            editDayModal: {
-                modal: document.getElementById('edit-day-modal'),
-                title: document.getElementById('edit-day-modal-title'),
-                date: document.getElementById('edit-day-date'),
-                cycles: document.getElementById('edit-day-cycles'),
-                tasks: document.getElementById('edit-day-tasks'),
-                saveBtn: document.getElementById('save-day-edit-btn')
-            },
-            configModal: {
-                modal: document.getElementById('config-modal'),
-                newInput: document.getElementById('new-negotiable-input'),
-                addBtn: document.getElementById('add-negotiable-btn'),
-                list: document.getElementById('config-list'),
-                saveBtn: document.getElementById('save-config-btn')
-            },
-            taskTemplate: document.getElementById('task-item-template'),
-            dayTemplate: document.getElementById('day-item-template'),
+            logModal: document.getElementById('log-modal'),
+            closeLogModal: document.getElementById('close-log-modal'),
+            logTableBody: document.getElementById('log-table-body'),
+            exportBtn: document.getElementById('export-btn')
         };
 
         // --- UTILITY FUNCTIONS ---
@@ -420,62 +262,50 @@
             return `${minutes}:${secs.toString().padStart(2, '0')}`;
         }
 
-        function validateInput(value, min, max, defaultValue) {
-            const num = parseInt(value) || defaultValue;
-            return Math.max(min, Math.min(max, num));
-        }
-
         function getTodayString() {
             return new Date().toDateString();
         }
 
-        function ensureHistoryExists(dateStr) {
-            if (!state.history[dateStr]) {
-                state.history[dateStr] = { cycles: 0, doToday: [], nonNegotiables: {} };
-            }
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
         }
 
-        // --- CORE APP LIFECYCLE ---
+        function getDayName(dateStr) {
+            const date = new Date(dateStr);
+            const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            return days[date.getDay()];
+        }
+
+        // --- INITIALIZATION ---
         function init() {
             loadData();
-            ensureDefaultNonNegotiables(); // Force check for defaults
-            checkNewDay(); 
+            checkNewDay();
             updateTimerDisplay();
-            updateProgress();
+            updateStats();
             renderAllTasks();
-            renderHistory();
             setupEventListeners();
-            initSidebar();
             requestNotificationPermission();
-        }
-
-        function ensureDefaultNonNegotiables() {
-            // Force add defaults if list is empty, regardless of saved data
-            if (!state.nonNegotiables || state.nonNegotiables.length === 0) {
-                console.log('Adding default non-negotiables...');
-                state.nonNegotiables = [...DEFAULT_NON_NEGOTIABLES];
-                saveData(); // Immediately save the defaults
-            }
+            calculateStreak();
+            calculateMonthTotal();
         }
 
         function saveData() {
             try {
                 const dataToSave = { 
                     ...state, 
-                    timerInterval: null, 
-                    tempNonNegotiables: [],
+                    timerInterval: null,
                     audioContext: null
                 };
-                localStorage.setItem('skull-terminator-data', JSON.stringify(dataToSave));
+                localStorage.setItem('skull-terminator-v2-data', JSON.stringify(dataToSave));
             } catch (error) {
                 console.error('Failed to save data:', error);
-                showInAppNotification('Erro', 'Falha ao salvar dados');
             }
         }
 
         function loadData() {
             try {
-                const savedData = localStorage.getItem('skull-terminator-data');
+                const savedData = localStorage.getItem('skull-terminator-v2-data');
                 if (savedData) {
                     const parsedData = JSON.parse(savedData);
                     state = { ...state, ...parsedData };
@@ -483,44 +313,42 @@
                     state.timerInterval = null;
                     state.audioContext = null;
                     
-                    // Ensure daily goal is at least 14
-                    if (state.dailyGoal < 14) {
-                        state.dailyGoal = 14;
-                    }
-                    
-                    console.log('Loaded data, non-negotiables count:', state.nonNegotiables?.length || 0);
-                } else {
-                    console.log('No saved data found, will use defaults');
+                    // Reset non-negotiables to ensure they're always the same
+                    state.nonNegotiables = [
+                        { id: 'reels', text: '1 Reels', completed: false },
+                        { id: 'stories', text: '1 Stories Sequence / Single Insight', completed: false },
+                        { id: 'dm', text: '1/2 Cicles DM Clients / Followers', completed: false },
+                        { id: 'ai', text: '1/2 Cicles AI Knowledge / Product Building', completed: false },
+                        { id: 'meditation', text: 'Joe Dispenza Meditation', completed: false },
+                        { id: 'surf', text: 'Surf Workout / Session', completed: false },
+                        { id: 'reading', text: 'Reading', completed: false }
+                    ];
                 }
             } catch (error) {
                 console.error('Failed to load data:', error);
-                showInAppNotification('Erro', 'Falha ao carregar dados salvos');
-                // Reset to ensure defaults will be applied
-                state.nonNegotiables = [];
             }
         }
-        
+
         function checkNewDay() {
             const todayStr = getTodayString();
-            ensureHistoryExists(todayStr);
+            if (!state.history[todayStr]) {
+                state.history[todayStr] = {
+                    cycles: 0,
+                    tasks: [],
+                    nonNegotiables: {}
+                };
+            }
             
             const todayData = state.history[todayStr];
             state.cyclesCompleted = todayData.cycles || 0;
-            state.doTodayTasks = todayData.doToday || [];
-            state.nonNegotiablesStatus = todayData.nonNegotiables || {};
+            state.doTodayTasks = todayData.tasks || [];
+            
+            // Load today's non-negotiables status
+            state.nonNegotiables.forEach(item => {
+                item.completed = todayData.nonNegotiables[item.id] || false;
+            });
         }
 
-        function cleanup() {
-            if (state.timerInterval) {
-                clearInterval(state.timerInterval);
-                state.timerInterval = null;
-            }
-            if (state.audioContext) {
-                state.audioContext.close();
-                state.audioContext = null;
-            }
-        }
-        
         // --- TIMER FUNCTIONS ---
         function toggleTimer() {
             if (!state.isRunning) {
@@ -529,10 +357,10 @@
                 pauseTimer();
             }
         }
-        
+
         function startTimer() {
             state.isRunning = true;
-            elements.startBtn.innerHTML = i18n.pause;
+            elements.startBtn.innerHTML = '⏸ Pausar';
             state.timerInterval = setInterval(() => {
                 state.currentTime--;
                 if (state.currentTime < 0) {
@@ -549,7 +377,7 @@
                 clearInterval(state.timerInterval);
                 state.timerInterval = null;
             }
-            elements.startBtn.innerHTML = i18n.start;
+            elements.startBtn.innerHTML = '▶ Iniciar';
         }
 
         function resetTimer() {
@@ -565,35 +393,30 @@
 
         function completePhase() {
             const todayStr = getTodayString();
-            ensureHistoryExists(todayStr);
             
-            playSoundNotification(); 
+            playSoundNotification();
 
             if (state.isRestPhase) {
                 state.cyclesCompleted++;
                 state.history[todayStr].cycles = state.cyclesCompleted;
                 state.isRestPhase = false;
                 state.currentTime = FOCUS_TIME;
-                showNotification('🔥 Ciclo Completo!', `Ótimo! Você completou ${state.cyclesCompleted} ciclos hoje.`);
-                showInAppNotification('🔥 Ciclo Completo!', `Ótimo! Você completou ${state.cyclesCompleted} ciclos hoje.`);
+                showInAppNotification('🔥 Ciclo Completo!', `Você completou ${state.cyclesCompleted} ciclos hoje.`);
             } else {
                 state.isRestPhase = true;
                 state.currentTime = REST_TIME;
-                showNotification('😌 Hora de Descansar!', 'Boa sessão de foco! Faça uma pausa merecida.');
-                showInAppNotification('😌 Hora de Descansar!', 'Boa sessão de foco! Faça uma pausa merecida.');
+                showInAppNotification('😌 Hora de Descansar!', 'Boa sessão de foco! Faça uma pausa.');
             }
             
             updateTimerDisplay();
-            updateProgress();
-            renderHistory();
+            updateStats();
             saveData();
             
-            // Don't auto-start next phase - let user decide
             state.isRunning = false;
-            elements.startBtn.innerHTML = i18n.start;
+            elements.startBtn.innerHTML = '▶ Iniciar';
         }
-        
-        // --- AUDIO NOTIFICATION ---
+
+        // --- AUDIO ---
         function initAudioContext() {
             if (!state.audioContext) {
                 try {
@@ -628,371 +451,315 @@
                 console.warn('Failed to play sound:', error);
             }
         }
-        
-        // --- RENDER & DISPLAY FUNCTIONS ---
-        function updateTimerDisplay() {
-    const timeString = formatTime(state.currentTime);
-    elements.timerDisplay.textContent = timeString;
-    
-    // Show current task in title if focusing
-    let titlePrefix = timeString;
-    if (state.currentFocusTask && !state.isRestPhase) {
-        const currentTask = state.doTodayTasks.find(t => t.id === state.currentFocusTask);
-        if (currentTask) {
-            titlePrefix = `${timeString} - ${currentTask.text.substring(0, 30)}${currentTask.text.length > 30 ? '...' : ''}`;
-        }
-    }
-    
-    document.title = `${titlePrefix} - ${state.isRestPhase ? i18n.restSession : i18n.focusSession}`;
-    elements.phaseIndicator.textContent = state.isRestPhase ? i18n.restSession : i18n.focusSession;
-    elements.nextPhase.textContent = state.isRestPhase ? i18n.nextFocus : i18n.nextRest;
-}
 
-        function updateProgress() {
-            elements.cyclesToday.textContent = state.cyclesCompleted;
-            elements.goalEdit.value = state.dailyGoal;
-            
-            const percentage = state.dailyGoal > 0 ? Math.round((state.cyclesCompleted / state.dailyGoal) * 100) : 0;
-            const displayPercentage = Math.min(percentage, 100);
-            
-            elements.percentage.textContent = `${percentage}%`;
-            elements.progressFill.style.width = `${displayPercentage}%`;
+        // --- DISPLAY FUNCTIONS ---
+        function updateTimerDisplay() {
+            const timeString = formatTime(state.currentTime);
+            elements.timerDisplay.textContent = timeString;
+            document.title = `${timeString} - ${state.isRestPhase ? 'Descanso' : 'Foco'}`;
+            elements.phaseIndicator.textContent = state.isRestPhase ? 'Sessão de Descanso' : 'Sessão de Foco';
+            elements.nextPhase.textContent = state.isRestPhase ? 
+                `Próximo: Foco (${formatTime(FOCUS_TIME)})` : 
+                `Próximo: Descanso (${formatTime(REST_TIME)})`;
         }
-        
+
+        function updateStats() {
+            elements.cyclesToday.textContent = state.cyclesCompleted;
+            calculateStreak();
+            calculateMonthTotal();
+        }
+
+        function calculateStreak() {
+            const dates = Object.keys(state.history).sort((a, b) => new Date(b) - new Date(a));
+            let streak = 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            for (let i = 0; i < dates.length; i++) {
+                const date = new Date(dates[i]);
+                date.setHours(0, 0, 0, 0);
+                const dayDiff = Math.floor((today - date) / (1000 * 60 * 60 * 24));
+                
+                if (dayDiff === streak && state.history[dates[i]].cycles > 0) {
+                    streak++;
+                } else if (dayDiff > streak) {
+                    break;
+                }
+            }
+            
+            state.currentStreak = streak;
+            elements.currentStreak.innerHTML = `${streak}<span class="streak-fire">🔥</span>`;
+        }
+
+        function calculateMonthTotal() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            
+            let total = 0;
+            Object.keys(state.history).forEach(dateStr => {
+                const date = new Date(dateStr);
+                if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+                    total += state.history[dateStr].cycles || 0;
+                }
+            });
+            
+            state.monthTotal = total;
+            elements.monthTotal.textContent = total;
+        }
+
+        // --- TASK MANAGEMENT ---
         function renderAllTasks() {
             renderDoToday();
             renderNonNegotiables();
         }
-        
-        function renderTask(container, tasks, isCompletedFn, template, useTextAsId = false) {
-    container.innerHTML = '';
-    const sortedTasks = [...tasks].sort((a, b) => isCompletedFn(a) - isCompletedFn(b));
-    
-    sortedTasks.forEach(task => {
-        const taskClone = template.content.cloneNode(true);
-        const taskItem = taskClone.querySelector('.task-item');
-        const checkbox = taskClone.querySelector('.task-checkbox');
-        const text = taskClone.querySelector('.task-text');
-        
-        const completed = isCompletedFn(task);
-        taskItem.classList.toggle('completed', completed);
-        taskItem.dataset.id = useTextAsId ? task.text : (task.id || task.text);
-        checkbox.classList.toggle('checked', completed);
-        checkbox.innerHTML = completed ? '✓' : '';
-        text.textContent = task.text;
-        
-        // Add focus button for "Fazer Hoje" tasks only
-        if (!useTextAsId && !completed) {
-            const focusBtn = document.createElement('button');
-            focusBtn.className = 'task-focus-btn';
-            focusBtn.innerHTML = '+';
-            focusBtn.title = 'Focar nesta tarefa';
-            taskItem.appendChild(focusBtn);
-        }
-        
-        // Add current task indicator
-if (!useTextAsId && task.id === state.currentFocusTask) {
-    const indicator = document.createElement('span');
-    indicator.className = 'current-task-indicator';
-    indicator.textContent = '🎯 Focando';
-    
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'remove-focus-btn';
-    removeBtn.innerHTML = '×';
-    removeBtn.title = 'Parar de focar nesta tarefa';
-    
-    taskItem.appendChild(indicator);
-    taskItem.appendChild(removeBtn);
-}
-        
-        container.appendChild(taskClone);
-    });
-}
 
         function renderDoToday() {
-            renderTask(elements.doTodayList, state.doTodayTasks, task => task.completed, elements.taskTemplate, false);
-            updateTaskProgress(elements.doTodayCount, elements.doTodayProgress, state.doTodayTasks, task => task.completed);
+            elements.doTodayList.innerHTML = '';
+            const sortedTasks = [...state.doTodayTasks].sort((a, b) => a.completed - b.completed);
+            
+            sortedTasks.forEach(task => {
+                const taskItem = document.createElement('div');
+                taskItem.className = `task-item ${task.completed ? 'completed' : ''}`;
+                taskItem.dataset.id = task.id;
+                
+                const checkbox = document.createElement('div');
+                checkbox.className = `task-checkbox ${task.completed ? 'checked' : ''}`;
+                checkbox.innerHTML = task.completed ? '✓' : '';
+                
+                const text = document.createElement('div');
+                text.className = 'task-text';
+                text.textContent = task.text;
+                
+                taskItem.appendChild(checkbox);
+                taskItem.appendChild(text);
+                elements.doTodayList.appendChild(taskItem);
+            });
+            
+            updateTaskProgress();
         }
 
         function renderNonNegotiables() {
-            renderTask(elements.nonNegotiablesList, state.nonNegotiables, item => !!state.nonNegotiablesStatus[item.text], elements.taskTemplate, true);
-            updateTaskProgress(elements.nonNegotiablesCount, elements.nonNegotiablesProgress, state.nonNegotiables, item => !!state.nonNegotiablesStatus[item.text]);
+            elements.nonNegotiablesList.innerHTML = '';
+            
+            state.nonNegotiables.forEach(item => {
+                const taskItem = document.createElement('div');
+                taskItem.className = `task-item ${item.completed ? 'completed' : ''}`;
+                taskItem.dataset.id = item.id;
+                
+                const checkbox = document.createElement('div');
+                checkbox.className = `task-checkbox ${item.completed ? 'checked' : ''}`;
+                checkbox.innerHTML = item.completed ? '✓' : '';
+                
+                const text = document.createElement('div');
+                text.className = 'task-text';
+                text.textContent = item.text;
+                
+                taskItem.appendChild(checkbox);
+                taskItem.appendChild(text);
+                elements.nonNegotiablesList.appendChild(taskItem);
+            });
+            
+            updateNonNegotiablesProgress();
         }
 
-        function updateTaskProgress(countEl, progressEl, tasks, isCompletedFn) {
-            const total = tasks.length;
-            const completed = tasks.filter(isCompletedFn).length;
+        function updateTaskProgress() {
+            const total = state.doTodayTasks.length;
+            const completed = state.doTodayTasks.filter(t => t.completed).length;
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-            countEl.textContent = `${completed} de ${total} concluídas`;
-            progressEl.style.width = `${percentage}%`;
+            elements.doTodayCount.textContent = `${completed} de ${total} concluídas`;
+            elements.doTodayProgress.style.width = `${percentage}%`;
         }
 
-        // --- TASK MANAGEMENT ---
+        function updateNonNegotiablesProgress() {
+            const total = state.nonNegotiables.length;
+            const completed = state.nonNegotiables.filter(n => n.completed).length;
+            const percentage = Math.round((completed / total) * 100);
+            elements.nonNegotiablesCount.textContent = `${completed} de ${total} concluídos`;
+            elements.nonNegotiablesProgress.style.width = `${percentage}%`;
+        }
+
         function addDoTodayTask() {
             const text = elements.addTaskInput.value.trim();
             if (text && text.length <= 200) {
                 const todayStr = getTodayString();
-                ensureHistoryExists(todayStr);
-                
-                state.doTodayTasks.push({ id: generateUniqueId(), text, completed: false });
-                state.history[todayStr].doToday = state.doTodayTasks;
+                const task = { id: generateUniqueId(), text, completed: false };
+                state.doTodayTasks.push(task);
+                state.history[todayStr].tasks = state.doTodayTasks;
                 elements.addTaskInput.value = '';
                 renderDoToday();
                 saveData();
             }
         }
-        
+
         function toggleDoTodayTask(taskId) {
             const task = state.doTodayTasks.find(t => t.id === taskId);
             if (task) {
                 const todayStr = getTodayString();
-                ensureHistoryExists(todayStr);
-                
                 task.completed = !task.completed;
                 if (task.completed) {
-                    showNotification('✅ Tarefa Concluída!', `"${task.text}" - Bom trabalho!`);
                     showInAppNotification('✅ Tarefa Concluída!', `"${task.text}" - Bom trabalho!`);
                 }
-                state.history[todayStr].doToday = state.doTodayTasks;
+                state.history[todayStr].tasks = state.doTodayTasks;
                 renderDoToday();
                 saveData();
             }
         }
-        
-        function toggleNonNegotiable(text) {
-            const todayStr = getTodayString();
-            ensureHistoryExists(todayStr);
-            
-            state.nonNegotiablesStatus[text] = !state.nonNegotiablesStatus[text];
-            if (state.nonNegotiablesStatus[text]) {
-                showNotification('⚡ Inegociável Feito!', `"${text}" - Você é imparável!`);
-                showInAppNotification('⚡ Inegociável Feito!', `"${text}" - Você é imparável!`);
+
+        function toggleNonNegotiable(id) {
+            const item = state.nonNegotiables.find(n => n.id === id);
+            if (item) {
+                const todayStr = getTodayString();
+                item.completed = !item.completed;
+                state.history[todayStr].nonNegotiables[id] = item.completed;
+                if (item.completed) {
+                    showInAppNotification('⚡ Inegociável Feito!', `"${item.text}" - Você é imparável!`);
+                }
+                renderNonNegotiables();
+                saveData();
             }
-            state.history[todayStr].nonNegotiables = state.nonNegotiablesStatus;
-            renderNonNegotiables();
-            saveData();
         }
-        
+
         function clearCompletedTasks() {
             const todayStr = getTodayString();
-            ensureHistoryExists(todayStr);
-            
             state.doTodayTasks = state.doTodayTasks.filter(task => !task.completed);
-            state.history[todayStr].doToday = state.doTodayTasks;
+            state.history[todayStr].tasks = state.doTodayTasks;
             renderDoToday();
             saveData();
         }
-        
-        // --- HISTORY MANAGEMENT ---
-        function renderHistory() {
-            elements.historyList.innerHTML = '';
-            const sortedDays = Object.keys(state.history).sort((a, b) => new Date(b) - new Date(a));
-            
-            sortedDays.forEach(dateStr => {
-                const dayData = state.history[dateStr];
-                const clone = elements.dayTemplate.content.cloneNode(true);
-                const item = clone.querySelector('.day-item');
-                const name = clone.querySelector('.day-name');
-                const dateEl = clone.querySelector('.day-date');
-                const stats = clone.querySelector('.day-stats');
-                const editBtn = clone.querySelector('.edit-btn');
-                const deleteBtn = clone.querySelector('.delete-btn');
-                
-                const date = new Date(dateStr);
-                const today = new Date();
-                const isToday = date.toDateString() === today.toDateString();
-                
-                item.dataset.dateStr = dateStr;
-                item.classList.toggle('today', isToday);
-                
-                const dayDiff = Math.round((new Date(today.toDateString()) - new Date(date.toDateString())) / (1000 * 60 * 60 * 24));
 
-                if (dayDiff === 0) name.textContent = i18n.today;
-                else if (dayDiff === 1) name.textContent = i18n.yesterday;
-                else name.textContent = date.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' });
-
-                dateEl.textContent = date.toLocaleDateString('pt-BR');
-                stats.innerHTML = `<span class="cycles-count">${dayData.cycles || 0}</span> ciclos`;
-                
-                if (isToday) {
-                    deleteBtn.style.display = 'none';
-                }
-                
-                elements.historyList.appendChild(clone);
-            });
-        }
-
-        function deleteDay(dateStr) {
-            const date = new Date(dateStr).toLocaleDateString('pt-BR');
-            if (confirm(i18n.deleteConfirm(date))) {
-                delete state.history[dateStr];
-                saveData();
-                renderHistory();
-            }
-        }
-        
-        // --- MODAL FUNCTIONS ---
-        function openModal(modalEl) { 
-            modalEl.classList.add('active'); 
+        // --- LOG TABLE FUNCTIONS ---
+        function showLogModal() {
+            renderLogTable();
+            elements.logModal.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-        
-        function closeModal(modalEl) { 
-            modalEl.classList.remove('active'); 
+
+        function closeLogModal() {
+            elements.logModal.classList.remove('active');
             document.body.style.overflow = '';
         }
-        
-        function editDay(dateStr) {
-            state.currentEditingDay = dateStr;
-            ensureHistoryExists(dateStr);
-            const dayData = state.history[dateStr];
-            const date = new Date(dateStr);
-            
-            elements.editDayModal.title.textContent = `Editar ${date.toLocaleDateString('pt-BR')}`;
-            elements.editDayModal.date.value = date.toISOString().split('T')[0];
-            elements.editDayModal.cycles.value = dayData.cycles || 0;
-            elements.editDayModal.tasks.value = (dayData.doToday || []).map(t => t.text).join('\n');
-            
-            openModal(elements.editDayModal.modal);
-        }
 
-        function saveDayEdit() {
-            if (!state.currentEditingDay) return;
+        function renderLogTable() {
+            elements.logTableBody.innerHTML = '';
+            const sortedDates = Object.keys(state.history).sort((a, b) => new Date(b) - new Date(a));
             
-            const oldDateStr = state.currentEditingDay;
-            const newDate = new Date(elements.editDayModal.date.value + 'T00:00:00');
-            const newDateStr = newDate.toDateString();
+            let currentMonth = null;
+            let monthCycles = 0;
+            let monthDays = 0;
             
-            const oldTasks = state.history[oldDateStr]?.doToday || [];
-            const newTasksText = elements.editDayModal.tasks.value.trim().split('\n').filter(Boolean);
-            
-            const updatedTasks = newTasksText.map(text => {
-                const existingTask = oldTasks.find(t => t.text === text);
-                return existingTask || { id: generateUniqueId(), text, completed: false };
-            });
-
-            const cycles = validateInput(elements.editDayModal.cycles.value, 0, 100, 0);
-
-            const newDayData = {
-                cycles: cycles,
-                doToday: updatedTasks,
-                nonNegotiables: state.history[oldDateStr]?.nonNegotiables || {}
-            };
-
-            if (oldDateStr !== newDateStr) {
-                delete state.history[oldDateStr];
-            }
-            state.history[newDateStr] = newDayData;
-            
-            if (newDateStr === getTodayString()) {
-                checkNewDay(); 
-                updateProgress();
-                renderAllTasks();
-            }
-            
-            saveData();
-            renderHistory();
-            closeModal(elements.editDayModal.modal);
-            state.currentEditingDay = null;
-        }
-        
-        function openConfigModal() {
-            state.tempNonNegotiables = JSON.parse(JSON.stringify(state.nonNegotiables));
-            renderConfigModal();
-            openModal(elements.configModal.modal);
-        }
-
-        function renderConfigModal() {
-            elements.configModal.list.innerHTML = '';
-            state.tempNonNegotiables.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'config-item';
-                div.innerHTML = `
-                    <input type="text" class="config-input" value="${item.text}" data-index="${index}" maxlength="100">
-                    <select class="config-select" data-index="${index}">
-                        <option value="daily" ${item.frequency === 'daily' ? 'selected' : ''}>Diário</option>
-                        <option value="weekdays" ${item.frequency === 'weekdays' ? 'selected' : ''}>Dias de semana</option>
-                    </select>
-                    <button class="delete-btn" data-index="${index}">🗑</button>
-                `;
-                elements.configModal.list.appendChild(div);
-            });
-        }
-        
-        function addTempNonNegotiable() {
-            const text = elements.configModal.newInput.value.trim();
-            if (text && text.length <= 100) {
-                state.tempNonNegotiables.push({ text, frequency: 'daily' });
-                elements.configModal.newInput.value = '';
-                renderConfigModal();
-            }
-        }
-        
-        function saveConfiguration() {
-            state.nonNegotiables = state.tempNonNegotiables.filter(item => item.text.trim());
-            state.tempNonNegotiables = [];
-            closeModal(elements.configModal.modal);
-            renderNonNegotiables();
-            saveData();
-        }
-        
-        // --- SIDEBAR & NOTIFICATIONS ---
-        function toggleSidebar() {
-            const { sidebar, mainContent, sidebarToggle } = elements;
-            
-            if (window.innerWidth > 768) {
-                const isCollapsed = sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('sidebar-collapsed', isCollapsed);
-                state.isSidebarCollapsed = isCollapsed;
+            sortedDates.forEach(dateStr => {
+                const date = new Date(dateStr);
+                const month = date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+                const dayData = state.history[dateStr];
                 
-                sidebarToggle.innerHTML = isCollapsed ? '📅' : '❮';
-                sidebarToggle.style.left = isCollapsed ? '20px' : '300px';
-            } else {
-                const isActive = sidebar.classList.toggle('active');
-                sidebarToggle.innerHTML = isActive ? '❮' : '📅';
-            }
-            saveData();
-        }
-        
-        function initSidebar() {
-            const { sidebar, mainContent, sidebarToggle } = elements;
+                // Add month header if new month
+                if (month !== currentMonth) {
+                    if (currentMonth !== null) {
+                        // Add month summary row
+                        const summaryRow = document.createElement('tr');
+                        summaryRow.className = 'month-summary';
+                        summaryRow.innerHTML = `
+                            <td colspan="3">Total do Mês</td>
+                            <td colspan="7">${monthCycles} ciclos em ${monthDays} dias</td>
+                        `;
+                        elements.logTableBody.appendChild(summaryRow);
+                    }
+                    
+                    currentMonth = month;
+                    monthCycles = 0;
+                    monthDays = 0;
+                    
+                    const monthRow = document.createElement('tr');
+                    monthRow.className = 'month-header';
+                    monthRow.innerHTML = `<td colspan="10">${month}</td>`;
+                    elements.logTableBody.appendChild(monthRow);
+                }
+                
+                monthCycles += dayData.cycles || 0;
+                if (dayData.cycles > 0) monthDays++;
+                
+                const row = document.createElement('tr');
+                const isToday = dateStr === getTodayString();
+                if (isToday) row.className = 'today-row';
+                
+                const completedTasks = (dayData.tasks || []).filter(t => t.completed).length;
+                const totalTasks = (dayData.tasks || []).length;
+                
+                row.innerHTML = `
+                    <td>${formatDate(dateStr)}</td>
+                    <td>${getDayName(dateStr)}</td>
+                    <td><strong>${dayData.cycles || 0}</strong></td>
+                    <td>${dayData.nonNegotiables?.reels ? '✅' : '⬜'}</td>
+                    <td>${dayData.nonNegotiables?.stories ? '✅' : '⬜'}</td>
+                    <td>${dayData.nonNegotiables?.dm ? '✅' : '⬜'}</td>
+                    <td>${dayData.nonNegotiables?.ai ? '✅' : '⬜'}</td>
+                    <td>${dayData.nonNegotiables?.meditation ? '✅' : '⬜'}</td>
+                    <td>${dayData.nonNegotiables?.surf ? '✅' : '⬜'}</td>
+                    <td>${dayData.nonNegotiables?.reading ? '✅' : '⬜'}</td>
+                    <td>${completedTasks}/${totalTasks}</td>
+                `;
+                
+                elements.logTableBody.appendChild(row);
+            });
             
-            if (window.innerWidth > 768) {
-                sidebar.classList.toggle('collapsed', state.isSidebarCollapsed);
-                sidebar.classList.remove('active');
-                mainContent.classList.toggle('sidebar-collapsed', state.isSidebarCollapsed);
-                sidebarToggle.innerHTML = state.isSidebarCollapsed ? '📅' : '❮';
-                sidebarToggle.style.left = state.isSidebarCollapsed ? '20px' : '300px';
-            } else {
-                sidebar.classList.add('collapsed');
-                sidebar.classList.remove('active');
-                mainContent.classList.add('sidebar-collapsed');
-                sidebarToggle.innerHTML = '📅';
-                sidebarToggle.style.left = '20px';
+            // Add final month summary
+            if (currentMonth !== null) {
+                const summaryRow = document.createElement('tr');
+                summaryRow.className = 'month-summary';
+                summaryRow.innerHTML = `
+                    <td colspan="3">Total do Mês</td>
+                    <td colspan="7">${monthCycles} ciclos em ${monthDays} dias</td>
+                `;
+                elements.logTableBody.appendChild(summaryRow);
             }
         }
-        
+
+        function exportToCSV() {
+            const headers = ['Data', 'Dia', 'Ciclos', 'Reels', 'Stories', 'DM', 'AI/Product', 'Meditação', 'Surf/Treino', 'Leitura', 'Tarefas Completas'];
+            const rows = [];
+            
+            const sortedDates = Object.keys(state.history).sort((a, b) => new Date(b) - new Date(a));
+            
+            sortedDates.forEach(dateStr => {
+                const dayData = state.history[dateStr];
+                const completedTasks = (dayData.tasks || []).filter(t => t.completed).length;
+                const totalTasks = (dayData.tasks || []).length;
+                
+                rows.push([
+                    formatDate(dateStr),
+                    getDayName(dateStr),
+                    dayData.cycles || 0,
+                    dayData.nonNegotiables?.reels ? 'Sim' : 'Não',
+                    dayData.nonNegotiables?.stories ? 'Sim' : 'Não',
+                    dayData.nonNegotiables?.dm ? 'Sim' : 'Não',
+                    dayData.nonNegotiables?.ai ? 'Sim' : 'Não',
+                    dayData.nonNegotiables?.meditation ? 'Sim' : 'Não',
+                    dayData.nonNegotiables?.surf ? 'Sim' : 'Não',
+                    dayData.nonNegotiables?.reading ? 'Sim' : 'Não',
+                    `${completedTasks}/${totalTasks}`
+                ]);
+            });
+            
+            const csvContent = [headers, ...rows]
+                .map(row => row.map(cell => `"${cell}"`).join(','))
+                .join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `productivity_log_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- NOTIFICATIONS ---
         function requestNotificationPermission() {
             if ('Notification' in window && Notification.permission === 'default') {
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted') {
-                        showInAppNotification('Notificações Ativadas!', 'Você será notificado ao final de cada ciclo.');
-                    }
-                });
-            }
-        }
-
-        function showNotification(title, body) {
-            if ('Notification' in window && Notification.permission === 'granted') {
-                try {
-                    new Notification(title, { 
-                        body, 
-                        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💀</text></svg>',
-                        silent: false
-                    });
-                } catch (error) {
-                    console.warn('Failed to show notification:', error);
-                }
+                Notification.requestPermission();
             }
         }
 
@@ -1004,9 +771,21 @@ if (!useTextAsId && task.id === state.currentFocusTask) {
             setTimeout(() => {
                 elements.notification.classList.remove('show');
             }, 4000);
+            
+            // Also try browser notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+                try {
+                    new Notification(title, { 
+                        body, 
+                        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💀</text></svg>'
+                    });
+                } catch (error) {
+                    console.warn('Failed to show notification:', error);
+                }
+            }
         }
-        
-        // --- EVENT LISTENERS SETUP ---
+
+        // --- EVENT LISTENERS ---
         function setupEventListeners() {
             // Timer controls
             elements.startBtn.addEventListener('click', toggleTimer);
@@ -1021,101 +800,48 @@ if (!useTextAsId && task.id === state.currentFocusTask) {
                 }
             });
             elements.clearCompletedBtn.addEventListener('click', clearCompletedTasks);
-            elements.configBtn.addEventListener('click', openConfigModal);
 
-            // Progress goal
-            elements.goalEdit.addEventListener('change', () => {
-                state.dailyGoal = validateInput(elements.goalEdit.value, 14, 50, 14);
-                elements.goalEdit.value = state.dailyGoal;
-                updateProgress();
-                saveData();
-            });
-            
-            // Sidebar controls
-            elements.sidebarToggle.addEventListener('click', toggleSidebar);
-            elements.sidebarCollapseBtn.addEventListener('click', toggleSidebar);
-
-            // Modals
-            elements.editDayModal.saveBtn.addEventListener('click', saveDayEdit);
-            elements.configModal.addBtn.addEventListener('click', addTempNonNegotiable);
-            elements.configModal.newInput.addEventListener('keypress', e => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    addTempNonNegotiable();
+            // Task clicking
+            elements.doTodayList.addEventListener('click', e => {
+                const taskItem = e.target.closest('.task-item');
+                if (taskItem) {
+                    toggleDoTodayTask(taskItem.dataset.id);
                 }
             });
-            elements.configModal.saveBtn.addEventListener('click', saveConfiguration);
-            
-            // Event delegation for dynamic content
-            elements.doTodayList.addEventListener('click', e => {
-    const taskItem = e.target.closest('.task-item');
-    if (!taskItem) return;
-    
-    if (e.target.matches('.task-focus-btn')) {
-        // Set current focus task
-        state.currentFocusTask = taskItem.dataset.id;
-        renderDoToday();
-        updateTimerDisplay();
-        saveData();
-        showInAppNotification('🎯 Tarefa em Foco', 'Agora você está focando nesta tarefa!');
-    } else if (e.target.matches('.remove-focus-btn')) {
-        // Remove current focus task
-        state.currentFocusTask = null;
-        renderDoToday();
-        updateTimerDisplay();
-        saveData();
-        showInAppNotification('📋 Foco Removido', 'Você não está mais focando em uma tarefa específica.');
-    } else {
-        toggleDoTodayTask(taskItem.dataset.id);
-    }
-});
+
             elements.nonNegotiablesList.addEventListener('click', e => {
                 const taskItem = e.target.closest('.task-item');
-                if (taskItem) toggleNonNegotiable(taskItem.dataset.id);
-            });
-            
-            elements.historyList.addEventListener('click', e => {
-                const dayItem = e.target.closest('.day-item');
-                if (!dayItem) return;
-                
-                const dateStr = dayItem.dataset.dateStr;
-                if (!dateStr) return;
-                
-                if (e.target.closest('.edit-btn')) {
-                    editDay(dateStr);
-                } else if (e.target.closest('.delete-btn')) {
-                    deleteDay(dateStr);
-                }
-            });
-            
-            elements.configModal.list.addEventListener('click', e => {
-                const index = parseInt(e.target.dataset.index);
-                if (isNaN(index)) return;
-                
-                if (e.target.matches('.delete-btn')) {
-                    state.tempNonNegotiables.splice(index, 1);
-                    renderConfigModal();
-                }
-            });
-            
-            elements.configModal.list.addEventListener('change', e => {
-                const index = parseInt(e.target.dataset.index);
-                if (isNaN(index) || !state.tempNonNegotiables[index]) return;
-                
-                if (e.target.matches('.config-input')) {
-                    state.tempNonNegotiables[index].text = e.target.value.trim();
-                } else if (e.target.matches('.config-select')) {
-                    state.tempNonNegotiables[index].frequency = e.target.value;
+                if (taskItem) {
+                    toggleNonNegotiable(taskItem.dataset.id);
                 }
             });
 
-            // Generic modal close listeners
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.addEventListener('click', e => {
-                    if (e.target === modal || e.target.closest(`[data-close-modal="${modal.id}"]`)) {
-                        closeModal(modal);
-                    }
-                });
+            // Log modal
+            elements.viewLogBtn.addEventListener('click', showLogModal);
+            elements.closeLogModal.addEventListener('click', closeLogModal);
+            elements.exportBtn.addEventListener('click', exportToCSV);
+            
+            elements.logModal.addEventListener('click', e => {
+                if (e.target === elements.logModal) {
+                    closeLogModal();
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', e => {
+                if (document.activeElement.tagName === 'INPUT' || 
+                    elements.logModal.classList.contains('active')) {
+                    return;
+                }
+                
+                if (e.code === 'Space') { 
+                    e.preventDefault(); 
+                    toggleTimer(); 
+                }
+                if (e.key === 'r' || e.key === 'R') {
+                    e.preventDefault();
+                    resetTimer();
+                }
             });
 
             // Notification click to dismiss
@@ -1123,54 +849,19 @@ if (!useTextAsId && task.id === state.currentFocusTask) {
                 elements.notification.classList.remove('show');
             });
 
-            // Keyboard shortcuts
-document.addEventListener('keydown', e => {
-    if (document.activeElement.tagName === 'INPUT' || 
-        document.activeElement.tagName === 'TEXTAREA' ||
-        document.querySelector('.modal.active')) {
-        return;
-    }
-    
-    if (e.code === 'Space') { 
-        e.preventDefault(); 
-        // Only trigger if not clicking on the start button
-        if (e.target !== elements.startBtn && !elements.startBtn.contains(e.target)) {
-            toggleTimer(); 
-        }
-    }
-});
-
-            // Auto-save and cleanup
-            window.addEventListener('beforeunload', () => {
-                saveData();
-                cleanup();
-            });
-            
-            // Periodic checks
-            setInterval(checkNewDay, 60000); // Check for new day every minute
+            // Auto-save
+            window.addEventListener('beforeunload', saveData);
             setInterval(saveData, 30000); // Auto-save every 30 seconds
             
-            // Responsive sidebar
-            window.addEventListener('resize', initSidebar);
-            
-            // Handle visibility change for timer
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible' && state.isRunning) {
-                    // Verify timer is still running when tab becomes visible
-                    if (!state.timerInterval) {
-                        startTimer();
-                    }
-                }
-            });
+            // Periodic stats update
+            setInterval(() => {
+                checkNewDay();
+                updateStats();
+            }, 60000); // Check every minute
         }
 
-        // --- APP INITIALIZATION ---
+        // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', init);
-        
-        // Prevent context menu on production
-        if (window.location.protocol !== 'file:') {
-            document.addEventListener('contextmenu', e => e.preventDefault());
-        }
     </script>
 </body>
 </html>
