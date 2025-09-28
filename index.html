@@ -151,7 +151,7 @@
                 <div id="non-negotiables-list"></div>
                 <div class="task-progress-container">
                     <div class="task-progress-bar"><div class="task-progress-fill" id="non-negotiables-progress"></div></div>
-                    <div class="task-progress-text" id="non-negotiables-count">0 de 7 concluídos</div>
+                    <div class="task-progress-text" id="non-negotiables-count">0 de 6 concluídos</div>
                 </div>
             </div>
         </section>
@@ -177,7 +177,6 @@
                             <th>AI/Product</th>
                             <th>Meditação</th>
                             <th>Surf/Treino</th>
-                            <th>Leitura</th>
                             <th>Tarefas</th>
                         </tr>
                     </thead>
@@ -209,9 +208,8 @@
                 { id: 'stories', text: '1 Stories Sequence / Single Insight', completed: false },
                 { id: 'dm', text: '1/2 Cicles DM Clients / Followers', completed: false },
                 { id: 'ai', text: '1/2 Cicles AI Knowledge / Product Building', completed: false },
-                { id: 'meditation', text: 'Joe Dispenza Meditation', completed: false },
-                { id: 'surf', text: 'Surf Workout / Session', completed: false },
-                { id: 'reading', text: 'Reading', completed: false }
+                { id: 'meditation', text: 'Meditation', completed: false },
+                { id: 'surf', text: 'Surf / Workout Session', completed: false }
             ],
             history: {},
             audioContext: null,
@@ -319,9 +317,8 @@
                         { id: 'stories', text: '1 Stories Sequence / Single Insight', completed: false },
                         { id: 'dm', text: '1/2 Cicles DM Clients / Followers', completed: false },
                         { id: 'ai', text: '1/2 Cicles AI Knowledge / Product Building', completed: false },
-                        { id: 'meditation', text: 'Joe Dispenza Meditation', completed: false },
-                        { id: 'surf', text: 'Surf Workout / Session', completed: false },
-                        { id: 'reading', text: 'Reading', completed: false }
+                        { id: 'meditation', text: 'Meditation', completed: false },
+                        { id: 'surf', text: 'Surf / Workout Session', completed: false }
                     ];
                 }
             } catch (error) {
@@ -661,7 +658,7 @@
                         summaryRow.className = 'month-summary';
                         summaryRow.innerHTML = `
                             <td colspan="3">Total do Mês</td>
-                            <td colspan="7">${monthCycles} ciclos em ${monthDays} dias</td>
+                            <td colspan="6">${monthCycles} ciclos em ${monthDays} dias</td>
                         `;
                         elements.logTableBody.appendChild(summaryRow);
                     }
@@ -672,7 +669,7 @@
                     
                     const monthRow = document.createElement('tr');
                     monthRow.className = 'month-header';
-                    monthRow.innerHTML = `<td colspan="10">${month}</td>`;
+                    monthRow.innerHTML = `<td colspan="9">${month}</td>`;
                     elements.logTableBody.appendChild(monthRow);
                 }
                 
@@ -696,7 +693,6 @@
                     <td>${dayData.nonNegotiables?.ai ? '✅' : '⬜'}</td>
                     <td>${dayData.nonNegotiables?.meditation ? '✅' : '⬜'}</td>
                     <td>${dayData.nonNegotiables?.surf ? '✅' : '⬜'}</td>
-                    <td>${dayData.nonNegotiables?.reading ? '✅' : '⬜'}</td>
                     <td>${completedTasks}/${totalTasks}</td>
                 `;
                 
@@ -709,14 +705,14 @@
                 summaryRow.className = 'month-summary';
                 summaryRow.innerHTML = `
                     <td colspan="3">Total do Mês</td>
-                    <td colspan="7">${monthCycles} ciclos em ${monthDays} dias</td>
+                    <td colspan="6">${monthCycles} ciclos em ${monthDays} dias</td>
                 `;
                 elements.logTableBody.appendChild(summaryRow);
             }
         }
 
         function exportToCSV() {
-            const headers = ['Data', 'Dia', 'Ciclos', 'Reels', 'Stories', 'DM', 'AI/Product', 'Meditação', 'Surf/Treino', 'Leitura', 'Tarefas Completas'];
+            const headers = ['Data', 'Dia', 'Ciclos', 'Reels', 'Stories', 'DM', 'AI/Product', 'Meditação', 'Surf/Treino', 'Tarefas Completas'];
             const rows = [];
             
             const sortedDates = Object.keys(state.history).sort((a, b) => new Date(b) - new Date(a));
@@ -736,7 +732,6 @@
                     dayData.nonNegotiables?.ai ? 'Sim' : 'Não',
                     dayData.nonNegotiables?.meditation ? 'Sim' : 'Não',
                     dayData.nonNegotiables?.surf ? 'Sim' : 'Não',
-                    dayData.nonNegotiables?.reading ? 'Sim' : 'Não',
                     `${completedTasks}/${totalTasks}`
                 ]);
             });
