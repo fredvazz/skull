@@ -371,12 +371,6 @@
             opacity: 0.5;
         }
         
-        .schedule-info {
-            font-size: 11px;
-            color: #666;
-            margin-left: auto;
-        }
-        
         .modal {
             display: none;
             position: fixed;
@@ -653,10 +647,10 @@
                 backlog: []
             },
             nonNegotiables: [
-                { id: '1', text: 'Acquisition Work (Reels, Stories, DM\'s, Ads)', completed: false, schedule: 'Daily • Set duration on the schedule' },
-                { id: '2', text: 'Product Work (Study & Develop)', completed: false, schedule: 'Daily • Set duration on the schedule' },
-                { id: '3', text: 'Meditation', completed: false, schedule: 'Daily • Set duration on the schedule' },
-                { id: '4', text: 'Workout', completed: false, schedule: 'Daily • Set duration on the schedule' }
+                { id: '1', text: 'Acquisition Work (Reels, Stories, DM\'s, Ads)', completed: false },
+                { id: '2', text: 'Product Work (Study & Develop)', completed: false },
+                { id: '3', text: 'Meditation', completed: false },
+                { id: '4', text: 'Workout', completed: false }
             ],
             audioContext: null,
             currentMovingTaskId: null
@@ -702,6 +696,7 @@
             renderNonNegotiables();
             setupEventListeners();
             requestNotificationPermission();
+            scheduleNextMidnightCheck();
         }
         
         // Data Persistence
@@ -988,8 +983,7 @@
             const item = {
                 id: Date.now().toString(),
                 text: text,
-                completed: false,
-                schedule: 'Daily • Set duration on the schedule'
+                completed: false
             };
             
             state.nonNegotiables.push(item);
@@ -1034,7 +1028,6 @@
                 itemEl.innerHTML = `
                     <div class="task-checkbox ${item.completed ? 'checked' : ''}"></div>
                     <span class="task-text">${item.text}</span>
-                    <span class="schedule-info">${item.schedule}</span>
                 `;
                 
                 elements.nonNegotiablesList.appendChild(itemEl);
@@ -1234,8 +1227,8 @@
             window.addEventListener('beforeunload', saveData);
             setInterval(saveData, 30000);
             
-            // Check for new day every minute
-            setInterval(checkNewDay, 60000);
+            // Check for new day every 10 minutes as backup
+            setInterval(checkNewDay, 600000);
         }
         
         // Start the app
