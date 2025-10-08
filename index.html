@@ -746,7 +746,8 @@
         }
         
         function checkNewDay() {
-            const today = new Date().toDateString();
+            const now = new Date();
+            const today = now.toDateString();
             const savedDateCookie = document.cookie.split(';').find(c => c.trim().startsWith('skull_date='));
             const savedDate = savedDateCookie ? savedDateCookie.split('=')[1] : null;
             
@@ -766,7 +767,26 @@
                 
                 document.cookie = `skull_date=${today}; max-age=31536000; path=/`;
                 saveData();
+                
+                // Re-render everything
+                updateCyclesDisplay();
+                renderTasks();
+                renderNonNegotiables();
             }
+        }
+        
+        function scheduleNextMidnightCheck() {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+            
+            const timeUntilMidnight = tomorrow.getTime() - now.getTime();
+            
+            setTimeout(() => {
+                checkNewDay();
+                scheduleNextMidnightCheck();
+            }, timeUntilMidnight);
         }
         
         // Timer Functions
