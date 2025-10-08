@@ -703,19 +703,14 @@
         function saveData() {
             try {
                 const dataToSave = {
-                    ...state,
-                    timerInterval: null,
-                    audioContext: null,
-                    currentMovingTaskId: null
+                    currentTime: state.currentTime,
+                    isRestPhase: state.isRestPhase,
+                    cyclesCompleted: state.cyclesCompleted,
+                    activeTab: state.activeTab,
+                    tasks: state.tasks,
+                    nonNegotiables: state.nonNegotiables
                 };
-                const data = JSON.stringify(dataToSave);
-                const blob = new Blob([data], { type: 'application/json' });
-                const reader = new FileReader();
-                reader.onload = function() {
-                    const dataStr = reader.result.split(',')[1];
-                    document.cookie = `skull_data=${dataStr}; max-age=31536000; path=/`;
-                };
-                reader.readAsDataURL(blob);
+                localStorage.setItem('skull_terminator_data', JSON.stringify(dataToSave));
             } catch (error) {
                 console.error('Failed to save data:', error);
             }
@@ -723,17 +718,15 @@
         
         function loadData() {
             try {
-                const cookies = document.cookie.split(';');
-                const dataCookie = cookies.find(c => c.trim().startsWith('skull_data='));
-                if (dataCookie) {
-                    const dataStr = dataCookie.split('=')[1];
-                    const jsonStr = atob(dataStr);
-                    const parsedData = JSON.parse(jsonStr);
-                    state = { ...state, ...parsedData };
-                    state.isRunning = false;
-                    state.timerInterval = null;
-                    state.audioContext = null;
-                    state.currentMovingTaskId = null;
+                const savedData = localStorage.getItem('skull_terminator_data');
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    state.currentTime = parsedData.currentTime || state.currentTime;
+                    state.isRestPhase = parsedData.isRestPhase || false;
+                    state.cyclesCompleted = parsedData.cyclesCompleted || 0;
+                    state.activeTab = parsedData.activeTab || 'today';
+                    state.tasks = parsedData.tasks || state.tasks;
+                    state.nonNegotiables = parsedData.nonNegotiables || state.nonNegotiables;
                 }
             } catch (error) {
                 console.error('Failed to load data:', error);
@@ -743,8 +736,7 @@
         function checkNewDay() {
             const now = new Date();
             const today = now.toDateString();
-            const savedDateCookie = document.cookie.split(';').find(c => c.trim().startsWith('skull_date='));
-            const savedDate = savedDateCookie ? savedDateCookie.split('=')[1] : null;
+            const savedDate = localStorage.getItem('skull_last_date');
             
             if (savedDate !== today) {
                 // Delete completed tasks from today
@@ -760,7 +752,7 @@
                 // Reset non-negotiables
                 state.nonNegotiables.forEach(item => item.completed = false);
                 
-                document.cookie = `skull_date=${today}; max-age=31536000; path=/`;
+                localStorage.setItem('skull_last_date', today);
                 saveData();
                 
                 // Re-render everything
